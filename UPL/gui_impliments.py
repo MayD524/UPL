@@ -20,9 +20,21 @@ def popup(msg, title="!"):
 	popup.mainloop()
 
 
-def send_notification(icon, title, message):
+def send_notification(icon=None,threaded=True, title=None, message=None):
 	notifier = ToastNotifier()
-	notifier.show_toast(title, message, icon_path=icon)
+	if icon != None:
+		notifier.show_toast(
+			title, 
+			message, 
+			icon_path=icon,
+			threaded=threaded
+			)
+	else:
+		notifier.show_toast(
+			title, 
+			message,
+			threaded=threaded
+			)
 
 
 class TkinterCalendar(calendar.Calendar):

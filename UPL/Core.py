@@ -1,3 +1,4 @@
+from pathlib import Path
 import json
 import os
 
@@ -54,6 +55,19 @@ def ainput(prompt=None, outType=None, char_size=None, delim=None, ending=None):
 
 	else:
 		return outType(inp)
+
+def getHome():
+	return str(Path.home())
+
+def scan_dir(dir_name=None, full_dir=False):
+	folder = os.listdir(dir_name)
+	items = []
+	if full_dir == True:
+		for i in folder:
+			items.append(os.path.join(dir_name, i))
+		return items
+	else:
+		return folder
 
 def switch(cases:dict, val):
 	return cases[val] if val in cases.keys() else False

@@ -4,8 +4,6 @@ import sqlite3
 def sql_version():
 	return sqlite3.version
 
-## DB stuff is subject to drastic changes
-
 class sqlDB:
 	def __init__(self, db_file):
 		self.db_file = db_file
