@@ -13,7 +13,7 @@ class sqlDB:
 		try:
 			self.con = sqlite3.connect(self.db_file)
 		except sqlite3.Error as error:
-			raise error
+			return error
 
 	def sql_load(self):
 		print("Input values with '~' depicting new char")
@@ -30,7 +30,7 @@ class sqlDB:
 			cur.execute(self.sql_cmd)
 
 		except sqlite3.Error as error:
-			raise error
+			return error
 
 		finally:
 			con.commit()	

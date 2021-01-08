@@ -1,5 +1,6 @@
 from . import Core 
 from . import sqlDB as db
 from . import gui_impliments as gui
-from . import upl_speach
-__version__ = "0.0.2"
+from . import upl_speech
+
+__version__ = "0.0.4b"
