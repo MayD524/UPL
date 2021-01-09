@@ -1,2 +1,9 @@
 # UPL
-All parts are subject to change 
+Unofficial Python Library
+
+
+Version 0.0.4 beta
+
+Recommended install is through the given
+installer under the releases with the most
+up to date version of UPL (current - 0.0.4b)
