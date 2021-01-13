@@ -1,16 +1,25 @@
 from pathlib import Path
 import urllib.request
+import subprocess
 import webbrowser
 import zipfile
 import uuid
 import json
+import sys
 import os
 
-__version__ = "0.1.0"
+__version__ = "0.1.2"
 
+"""
+Pauses and waits for user to press
+enter
+"""
 def PAUSE():
 	input("ENTER TO CONTINUE")
 
+"""
+clears console
+"""
 def clear():
 	os.system("clear" if os.name != "nt" else "cls")
 
@@ -31,6 +40,10 @@ def total_upper(string):
 def open_web(url=None, new=1):
 	webbrowser.oepn(url, new=1)
 
+"""
+ainput > is input with options to do common 
+actions with console prompt 
+"""
 def ainput(prompt=None, outType=None, char_size=None, delim=None, ending=None):
 	if outType == None: outType = str if delim == None else list
 	if prompt == None: prompt = ""
@@ -68,9 +81,16 @@ def ainput(prompt=None, outType=None, char_size=None, delim=None, ending=None):
 	else:
 		return outType(inp)
 
+"""
+getHome > returns current users 
+home directory "C:\\Users\\Username"
+"""
 def getHome():
 	return str(Path.home())
 
+"""
+generate_uuid > returns a uuid
+"""
 def generate_uuid():
 	return str(uuid.uuid4())
 
@@ -79,20 +99,52 @@ def scan_dir(dir_name=None, full_dir=False):
 	items = []
 	if full_dir == True:
 		for i in folder:
-			items.append(os.path.join(dir_name, i))
+				items.append(os.path.join(dir_name, i))
 		return items
 	else:
 		return folder
 
+"""
+switch case implimentation in python
+"""
 def switch(cases:dict, val):
 	return cases[val] if val in cases.keys() else False
 
+"""
+checks if file/dir exists
+"""
 def file_exists(filename):
 	return True if os.path.exists(filename) else False
 
 def dir_exists(filename):
 	return True if os.path.isdir(filename) else False
 
+"""
+py_tools class is for python tools
+such as PIP and installing packages
+at runtime
+"""
+class py_tools:
+	def pip_install(package):
+		if type(package) == str:
+			subprocess.check_call([sys.executable, "-m", "pip", "install", package])
+		elif type(package) == list:
+			subprocess.check_call(package)
+
+
+"""
+system_tools class is for common
+system calls and actions 
+"""
+class system_tools:
+
+	def make_call(call):
+		subprocess.check_call(call)
+
+"""
+upl_web class is for 
+web tasks
+"""
 class upl_web:
 	def download_url(url=None, outdir=None):
 		if outdir == None:
@@ -120,6 +172,11 @@ class upl_web:
 		else:
 			return "Cannot Find That URL"
 
+"""
+upl_math class is for
+math and most return a
+lambda function
+"""
 class upl_math:
 
 	def geometric(first, common):
@@ -128,6 +185,12 @@ class upl_math:
 	def arithmetic(first, common):
 		return lambda n : first + common * (n - 1)
 
+
+"""
+file_manager class is for
+file management and directory
+with json support
+"""
 class file_manager:
 	## Json files
 	def getData_json(file):

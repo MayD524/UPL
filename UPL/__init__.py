@@ -1,6 +1,11 @@
-from . import Core 
-from . import sqlDB as db
 from . import gui_impliments as gui
+from . import upl_photoTools as photoTools
+from . import sqlDB as db
 from . import upl_speech
+from . import Core 
+from . import upl_time
 
-__version__ = "0.0.4b"
+"""
+added upl_keyboard
+"""
+__version__ = "0.0.5b"
