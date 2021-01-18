@@ -126,10 +126,22 @@ at runtime
 """
 class py_tools:
 	def pip_install(package):
-		if type(package) == str:
-			subprocess.check_call([sys.executable, "-m", "pip", "install", package])
-		elif type(package) == list:
-			subprocess.check_call(package)
+		try:
+			if type(package) == str:
+				subprocess.check_call([sys.executable, "-m", "pip", "install", package])
+			elif type(package) == list:
+				subprocess.check_call(package)
+		except Exception as e:
+			print(e)
+
+	def pip_install_mass(package):
+		for pack in package:
+			try:
+				subprocess.check_call([sys.executable, "-m", "pip", "install", pack])
+			except Exception as e:
+				print(e)
+
+
 
 
 """
@@ -140,6 +152,7 @@ class system_tools:
 
 	def make_call(call):
 		subprocess.check_call(call)
+
 
 """
 upl_web class is for 
@@ -238,7 +251,7 @@ class file_manager:
 			return f"File '{file}' was not found"
 
 	def write_file(file, data, mode=None):
-		if file_exists(file) and '+' not in mode:
+		if file_exists(file):
 			with open(file, mode if mode != None else "w") as writer:
 				writer.write(data)
 		else:
@@ -269,6 +282,7 @@ class file_manager:
 
 		else:
 			return f"{folderPath} is not a folder"
+
 	def zip_file(file=None, zipPath=None):
 		if file_exists(file):
 			if zipPath == None:
@@ -278,6 +292,19 @@ class file_manager:
 		else:
 			return f"{file} is not a file"
 	## General
+
+	def delete_file(filename):
+		if file_exists(filename):
+			os.remove(filename)
+		else:
+			return f"{filename} does not exist"
+
+	def create_dir(dir_name):
+		if dir_exists(dir_name):
+			return f"{dir_name} already exists"
+		else:
+			os.makedirs(dir_name)
+
 	def getSize(file):
 		if file_exists(file):
 			return os.path.getsize(file)
