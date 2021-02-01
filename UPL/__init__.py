@@ -9,3 +9,5 @@ from . import upl_time
 added upl_keyboard
 """
 __version__ = "0.0.5b"
+cwd = Core.currentDir()
+home = Core.getHome()

@@ -1,6 +1,9 @@
 from PIL import Image
 from UPL.Core import file_exists
 
+"""
+Converts any image file to an icon file
+"""
 def img2ico(infile, outfile, sizes=[(48,48)]):
 	if outfile.endswith(".ico"):
 		if file_exists(infile):

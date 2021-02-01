@@ -1,14 +1,19 @@
 from pathlib import Path
+from _thread import *
 import urllib.request
+import socketserver
 import subprocess
 import webbrowser
 import zipfile
+import hashlib
+import socket
 import uuid
 import json
 import sys
+import ast
 import os
 
-__version__ = "0.1.2"
+__version__ = "0.1.5"
 
 """
 Pauses and waits for user to press
@@ -16,6 +21,19 @@ enter
 """
 def PAUSE():
 	input("ENTER TO CONTINUE")
+
+def make_hash(data):
+	hash_obj = hashlib.sha256(data.encode('utf-8'))
+	return hash_obj.hexdigest()
+
+def uplSort(unsorted:list) -> list:
+	sorted = []
+
+	for i in range(len(unsorted)):
+		tmp = [] ## reset tmp
+		tmp.append(int(ord(unsorted[i][[x for x in range(len(unsorted[i]))]])))
+		print(tmp)
+
 
 """
 clears console
@@ -40,6 +58,8 @@ def total_upper(string):
 def open_web(url=None, new=1):
 	webbrowser.oepn(url, new=1)
 
+def currentDir():
+	return os.getcwd()
 """
 ainput > is input with options to do common 
 actions with console prompt 
@@ -81,6 +101,22 @@ def ainput(prompt=None, outType=None, char_size=None, delim=None, ending=None):
 	else:
 		return outType(inp)
 
+class dataTypes:
+	def strDict(string):
+		try:
+			return json.loads(string)
+		except json.JSONDecodeError as e:
+			return e
+
+	def strList(string):
+		return ast.literal_eval()
+
+
+	def dictFormat(dct):
+		try:
+			return json.dumps(dct)
+		except Exception as e:
+			print(e)
 """
 getHome > returns current users 
 home directory "C:\\Users\\Username"
@@ -140,6 +176,71 @@ class py_tools:
 				subprocess.check_call([sys.executable, "-m", "pip", "install", pack])
 			except Exception as e:
 				print(e)
+
+
+class upl_socket:
+	class client:
+		def __init__(self, hostname, port):
+			self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+			self.sock.connect((hostname, port))
+
+		def sendInfo(self, data):
+			if type(data) != bytes:
+				data = data.encode('ascii')
+
+			self.sock.send(data)
+
+		def formPacket(self, opCode, data):
+			return f"{opCode}:{data}:{str(type(data))}".encode('ascii')
+
+		def getdata(self, buffer):
+			return self.sock.recv(buffer)
+
+		def onStart(self):
+			loc = []
+			local = socket.gethostname()
+			localhash = make_hash(local)
+			loc.extend([local, localhash])
+			return loc
+
+		def uplClose(self):
+			self.sock.close()
+
+	class server:
+		def __init__(self, host, port):
+			self.ServerSocket = socket.socket()
+			self.ThreadCount = 0
+
+			try:
+				self.ServerSocket.bind((host, port))
+			except socket.error as e:
+				print(str(e))
+				return
+
+			print("Waiting for connections...")
+			self.ServerSocket.listen(5)
+
+		def threaded_client(self, connection, addr, c):
+			connection.send(str.encode('Welcome to the Server\n'))
+			while True:
+				data = connection.recv(2048)
+				reply = 'Server Says: You are thread: ' + str(c)
+				if not data:
+					break
+				connection.sendall(str.encode(reply))
+			self.ThreadCount -= 1
+			print(f"Disconnected from: {addr[0]}:{str(addr[1])}")
+			print(f"Thread Count: {self.ThreadCount}")
+			connection.close()
+
+		def main(self):
+			while True:
+				Client, address = self.ServerSocket.accept()
+				print('Connected to: ' + address[0] + ':' + str(address[1]))
+				start_new_thread(self.threaded_client, (Client, address, self.ThreadCount,))
+				self.ThreadCount += 1
+				print('Thread Number: ' + str(self.ThreadCount))
+			self.ServerSocket.close()
 
 
 
@@ -250,6 +351,12 @@ class file_manager:
 		else:
 			return f"File '{file}' was not found"
 
+	def make_file(file):
+		if not file_exists(file):
+			with open(file, "w+") as f:pass
+			return True
+		else:
+			return False
 	def write_file(file, data, mode=None):
 		if file_exists(file):
 			with open(file, mode if mode != None else "w") as writer:
@@ -291,6 +398,20 @@ class file_manager:
 				zipW.write(file)
 		else:
 			return f"{file} is not a file"
+
+	## Hash
+	def file_hash(file):
+		if file_exists(file):
+			hashs = []
+			with open(file, "r") as hash_reader:
+				hsmd5 = hashlib.md5(hash_reader.read().encode('utf-8'))
+				hssha1 = hashlib.sha1(hash_reader.read().encode('utf-8'))
+				hashs.append(hsmd5.hexdigest())
+				hashs.append(hssha1.hexdigest())
+				return hashs
+		else:
+			return f"{file} was not found"
+		
 	## General
 
 	def delete_file(filename):

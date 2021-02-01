@@ -3,6 +3,11 @@ import datetime
 
 class upl_time:
 
+	def upl_timestamp():
+		now = datetime.datetime.now()
+		return datetime.timestamp(now)
+
+
 	def date_comp(t2, date_format="%Y-%m-%d"):
 		"""
 		t1 should be the current date
