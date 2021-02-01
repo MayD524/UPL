@@ -2,8 +2,9 @@
 Unofficial Python Library
 
 
-Version 0.0.5 beta
+Version 0.6
 
-Recommended install is through the given
-installer under the releases with the most
-up to date version of UPL (current - 0.0.5b)
+Added socket support
+
+client class > UPL.Core.upl_socket.client
+server class > UPL.Core.upl_socket.server paired with UPL.Core.upl_socket.serverActions
