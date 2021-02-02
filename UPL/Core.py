@@ -338,17 +338,23 @@ class file_manager:
 			with open(file, "r") as hash_reader:
 				hsmd5 = hashlib.md5(hash_reader.read().encode('utf-8'))
 				hssha1 = hashlib.sha1(hash_reader.read().encode('utf-8'))
-				hashs.append(hsmd5.hexdigest())
-				hashs.append(hssha1.hexdigest())
+				hashs.extend([hsmd5.hexdigest(),hssha1.hexdigest()])
 				return hashs
 		else:
 			return f"{file} was not found"
 		
 	## General
+	def renameFile(filename, newFilename):
+		if file_exists(filename):
+			os.rename(filename, newFilename)
+			return True
+		else:
+			return f"{filename} does not eixst"
 
 	def delete_file(filename):
 		if file_exists(filename):
 			os.remove(filename)
+			return True
 		else:
 			return f"{filename} does not exist"
 
@@ -357,6 +363,7 @@ class file_manager:
 			return f"{dir_name} already exists"
 		else:
 			os.makedirs(dir_name)
+			return True
 
 	def getSize(file):
 		if file_exists(file):
@@ -403,14 +410,15 @@ class upl_socket:
 		Server actions
 		Things that the server can do
 	"""
+
 	class serverActions:
 		def __init__(self, conn, addr, threadID, config):
 			self.conn = conn
 			self.addr = addr
 			self.threadID = threadID
 			self.config = config
-			self.uConfig = file_manager.getData_json(self.config["users"])
-			self.securityProf = file_manager.getData_json((self.config["security"]))
+			self.uConfig = fm.getData_json(self.config["users"])
+			self.securityProf = fm.getData_json((self.config["security"]))
 
 			self.opCodeDict = {
 				0: self.connQuit,
@@ -420,6 +428,7 @@ class upl_socket:
 				9: self.makeFile,
 				10: self.writeOTHER,
 				11: self.writeJSON,
+				12: self.renameFile,
 				15: self.getDATA,
 				16: self.getJSON
 			}
@@ -436,28 +445,35 @@ class upl_socket:
 				tmp = {}
 				uuid = UPL.Core.generate_uuid()
 				permFile = f"no_touch\\{data[1]}.{uuid}.txt"
-				file_manager.make_file(permFile)
+				fm.make_file(permFile)
 				tmp[data[1]] = {"dev_name": data[0], "UUID": uuid, "dev_hash": UPL.Core.make_hash(data[0], uuid),
 								"permFile": permFile}
+
+		def renameFile(self, data):
+			if fm.renameFile(data[0], data[1]):
+				self.conn.send(bf"Renamed {data[0]} to {data[1]}")
+			else:
+				self.conn.send(bf"Could not find {data[0]}")
 
 		def mkdir(self, dirname):
 			if UPL.Core.dir_exists(dirname):
 				self.conn.send(b"dir exists")
 			else:
-				file_manager.create_dir(dirname)
+				fm.create_dir(dirname)
 				self.conn.send(b"dir made")
 
+		## will add stuff to this later not important yet
 		def setPerm(self, data):
 			pass
 
 		def getDATA(self, data):
-			file_data = "".join(file_manager.read_file(data))
+			file_data = "".join(fm.read_file(data))
 			file_data = file_data.encode('ascii')
 			self.conn.send(file_data)
 
 		def getJSON(self, data):
 			if UPL.Core.file_exists(data[0]):
-				jsonData = file_manager.getData_json(data[0])
+				jsonData = fm.getData_json(data[0])
 				data = jsonData[data[1]]
 				self.conn.send(str(data).encode('ascii'))
 
@@ -465,7 +481,7 @@ class upl_socket:
 			if UPL.Core.file_exists(data):
 				self.conn.send(b"That file already exists")
 			else:
-				file_manager.make_file(data)
+				fm.make_file(data)
 
 		def writeOTHER(self, data):
 			print(data)
@@ -474,7 +490,7 @@ class upl_socket:
 				if "not touch" in file or "ser":
 					self.conn.send(b"cant edit that file")
 				else:
-					file_manager.write_file(file, data=data)
+					fm.write_file(file, data=data)
 					self.conn.send(b"wrote file")
 
 		def writeJSON(self, data):
@@ -482,7 +498,7 @@ class upl_socket:
 			jsData = UPL.Core.dataTypes.strDict(data)
 			if UPL.Core.file_exists(file):
 				if "no touch" in file:
-					file_manager.write_json(jsData)
+					fm.write_json(jsData)
 
 		def process(self, opCode, data):
 			func = UPL.Core.switch(self.opCodeDict, opCode)
