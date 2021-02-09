@@ -98,9 +98,13 @@ def ainput(prompt=None, outType=None, char_size=None, delim=None, ending=None):
 		else:
 			raise Exception("Incorrect extention")
 
-	else:
-		return outType(inp)
+	##else: else not needed here
+	return outType(inp)
 
+"""
+DataTypes class has some useful tools
+to make data easier to handle.
+"""
 class dataTypes:
 	def strDict(string):
 		try:
@@ -109,7 +113,7 @@ class dataTypes:
 			return e
 
 	def strList(string):
-		return ast.literal_eval()
+		return ast.literal_eval(string) ## fixed (did nothing before) - Ryan
 
 
 	def dictFormat(dct):
@@ -131,13 +135,15 @@ def generate_uuid():
 	return str(uuid.uuid4())
 
 def scan_dir(dir_name=None, full_dir=False):
-	folder = os.listdir(dir_name)
-	items = []
-	if full_dir == True:
-		for i in folder:
-				items.append(os.path.join(dir_name, i))
-		return items
-	else:
+	## added if so dir_name cant be none 
+	if dir_name != None:
+		folder = os.listdir(dir_name)
+		items = []
+		if full_dir == True:
+			for i in folder:
+					items.append(os.path.join(dir_name, i))
+			return items
+		## else not needed here
 		return folder
 
 """
@@ -182,7 +188,8 @@ system_tools class is for common
 system calls and actions 
 """
 class system_tools:
-
+	## might add more to this, I haven't had much use for anything here
+	## so might just make make_call() into it's own func
 	def make_call(call):
 		subprocess.check_call(call)
 
@@ -192,10 +199,12 @@ upl_web class is for
 web tasks
 """
 class upl_web:
-	def download_url(url=None, outdir=None):
-		if outdir == None:
-			outdir = f"{getHome()}\\Downloads"
-		urllib.request.urlretrieve(url, outdir)
+	def download_url(url=None, outdir=None): ## returns void
+		if url != None:
+			## setting a default outdir - will break without
+			if outdir == None:
+				outdir = f"{getHome()}\\Downloads"
+			urllib.request.urlretrieve(url, outdir)
 
 	def url_exist(url):
 		"""
@@ -381,6 +390,7 @@ class upl_socket:
 	Ran on client side
 	"""
 	class client:
+		## add opcodes to cli side
 		def __init__(self, hostname, port):
 			self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 			self.sock.connect((hostname, port))
@@ -542,7 +552,8 @@ class upl_socket:
 				uData = bool(uData)
 
 			actClass.process(opCode, uData)
-
+			
+		## when connections are forced off it can throw an error but said error is not bad
 		def threaded_client(self, connection, addr, c):
 			SA = serverActions(connection, addr, c, self.config)
 			connection.send(str.encode('Welcome to the Server\n'))
