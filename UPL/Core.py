@@ -1,12 +1,9 @@
 from pathlib import Path
-from _thread import *
 import urllib.request
-import socketserver
 import subprocess
 import webbrowser
 import zipfile
 import hashlib
-import socket
 import uuid
 import json
 import sys
@@ -14,6 +11,13 @@ import ast
 import os
 
 __version__ = "0.1.6"
+
+"""
+	Moved socket stuff to upl_socket.py
+	it was getting to be a little too big to stay
+	in core.
+"""
+
 
 """
 Pauses and waits for user to press
@@ -25,15 +29,6 @@ def PAUSE():
 def make_hash(data):
 	hash_obj = hashlib.sha256(data.encode('utf-8'))
 	return hash_obj.hexdigest()
-
-def uplSort(unsorted:list) -> list:
-	sorted = []
-
-	for i in range(len(unsorted)):
-		tmp = [] ## reset tmp
-		tmp.append(int(ord(unsorted[i][[x for x in range(len(unsorted[i]))]])))
-		print(tmp)
-
 
 """
 clears console
@@ -60,6 +55,19 @@ def open_web(url=None, new=1):
 
 def currentDir():
 	return os.getcwd()
+
+## removes a character from string
+def exclude(string=None, remove=" "):
+	if string != None:
+		if remove in string:
+			return string.replace(remove, "")
+		else:
+			## remove not in string
+			return False
+	else:
+		## empty string
+		return False
+
 """
 ainput > is input with options to do common 
 actions with console prompt 
@@ -98,13 +106,9 @@ def ainput(prompt=None, outType=None, char_size=None, delim=None, ending=None):
 		else:
 			raise Exception("Incorrect extention")
 
-	##else: else not needed here
-	return outType(inp)
+	else:
+		return outType(inp)
 
-"""
-DataTypes class has some useful tools
-to make data easier to handle.
-"""
 class dataTypes:
 	def strDict(string):
 		try:
@@ -113,7 +117,7 @@ class dataTypes:
 			return e
 
 	def strList(string):
-		return ast.literal_eval(string) ## fixed (did nothing before) - Ryan
+		return ast.literal_eval(string)
 
 
 	def dictFormat(dct):
@@ -135,15 +139,13 @@ def generate_uuid():
 	return str(uuid.uuid4())
 
 def scan_dir(dir_name=None, full_dir=False):
-	## added if so dir_name cant be none 
-	if dir_name != None:
-		folder = os.listdir(dir_name)
-		items = []
-		if full_dir == True:
-			for i in folder:
-					items.append(os.path.join(dir_name, i))
-			return items
-		## else not needed here
+	folder = os.listdir(dir_name)
+	items = []
+	if full_dir == True:
+		for i in folder:
+				items.append(os.path.join(dir_name, i))
+		return items
+	else:
 		return folder
 
 """
@@ -188,8 +190,7 @@ system_tools class is for common
 system calls and actions 
 """
 class system_tools:
-	## might add more to this, I haven't had much use for anything here
-	## so might just make make_call() into it's own func
+
 	def make_call(call):
 		subprocess.check_call(call)
 
@@ -199,12 +200,10 @@ upl_web class is for
 web tasks
 """
 class upl_web:
-	def download_url(url=None, outdir=None): ## returns void
-		if url != None:
-			## setting a default outdir - will break without
-			if outdir == None:
-				outdir = f"{getHome()}\\Downloads"
-			urllib.request.urlretrieve(url, outdir)
+	def download_url(url=None, outdir=None):
+		if outdir == None:
+			outdir = f"{getHome()}\\Downloads"
+		urllib.request.urlretrieve(url, outdir)
 
 	def url_exist(url):
 		"""
@@ -381,200 +380,4 @@ class file_manager:
 		else:
 			return f"File '{file}' was not found or cannot be accessed"
 
-"""
-	UPL Socket support
-	for both client and server side
-"""
-class upl_socket:
-	"""
-	Ran on client side
-	"""
-	class client:
-		## add opcodes to cli side
-		def __init__(self, hostname, port):
-			self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-			self.sock.connect((hostname, port))
 
-		def sendInfo(self, data):
-			if type(data) != bytes:
-				data = data.encode('ascii')
-
-			self.sock.send(data)
-
-		def formPacket(self, opCode, data):
-			return f"{opCode}:{data}:{str(type(data))}".encode('ascii')
-
-		def getdata(self, buffer):
-			return self.sock.recv(buffer)
-
-		def onStart(self):
-			loc = []
-			local = socket.gethostname()
-			localhash = make_hash(local)
-			loc.extend([local, localhash])
-			return loc
-
-		def uplClose(self):
-			self.sock.close()
-	"""
-		Server actions
-		Things that the server can do
-	"""
-
-	class serverActions:
-		def __init__(self, conn, addr, threadID, config):
-			self.conn = conn
-			self.addr = addr
-			self.threadID = threadID
-			self.config = config
-			self.uConfig = fm.getData_json(self.config["users"])
-			self.securityProf = fm.getData_json((self.config["security"]))
-
-			self.opCodeDict = {
-				0: self.connQuit,
-				1: self.checkUINFO,
-				7: self.setPerm,
-				8: self.mkdir,
-				9: self.makeFile,
-				10: self.writeOTHER,
-				11: self.writeJSON,
-				12: self.renameFile,
-				15: self.getDATA,
-				16: self.getJSON
-			}
-
-		def connQuit(self):
-			self.conn.close()
-
-		def checkUINFO(self, data):
-			if data[1] in self.uConfig.keys():
-				if data[0] == self.uConfig["dev_name"] and self.uConfig["dev_hash"] == UPL.Core.make_hash(
-						data[0] + self.uConfig["UUID"]):
-					self.conn.send(b"returned true")
-			else:
-				tmp = {}
-				uuid = UPL.Core.generate_uuid()
-				permFile = f"no_touch\\{data[1]}.{uuid}.txt"
-				fm.make_file(permFile)
-				tmp[data[1]] = {"dev_name": data[0], "UUID": uuid, "dev_hash": UPL.Core.make_hash(data[0], uuid),
-								"permFile": permFile}
-
-		def renameFile(self, data):
-			if fm.renameFile(data[0], data[1]):
-				self.conn.send(bf"Renamed {data[0]} to {data[1]}")
-			else:
-				self.conn.send(bf"Could not find {data[0]}")
-
-		def mkdir(self, dirname):
-			if UPL.Core.dir_exists(dirname):
-				self.conn.send(b"dir exists")
-			else:
-				fm.create_dir(dirname)
-				self.conn.send(b"dir made")
-
-		## will add stuff to this later not important yet
-		def setPerm(self, data):
-			pass
-
-		def getDATA(self, data):
-			file_data = "".join(fm.read_file(data))
-			file_data = file_data.encode('ascii')
-			self.conn.send(file_data)
-
-		def getJSON(self, data):
-			if UPL.Core.file_exists(data[0]):
-				jsonData = fm.getData_json(data[0])
-				data = jsonData[data[1]]
-				self.conn.send(str(data).encode('ascii'))
-
-		def makeFile(self, data):
-			if UPL.Core.file_exists(data):
-				self.conn.send(b"That file already exists")
-			else:
-				fm.make_file(data)
-
-		def writeOTHER(self, data):
-			print(data)
-			data, file = data.split("/")
-			if UPL.Core.file_exists(file):
-				if "not touch" in file or "ser":
-					self.conn.send(b"cant edit that file")
-				else:
-					fm.write_file(file, data=data)
-					self.conn.send(b"wrote file")
-
-		def writeJSON(self, data):
-			data, file = data.split("/")
-			jsData = UPL.Core.dataTypes.strDict(data)
-			if UPL.Core.file_exists(file):
-				if "no touch" in file:
-					fm.write_json(jsData)
-
-		def process(self, opCode, data):
-			func = UPL.Core.switch(self.opCodeDict, opCode)
-			func(data)
-
-	"""
-	Ran on server side
-	"""
-	class server:
-		def __init__(self, host, port):
-			self.ServerSocket = socket.socket()
-			self.config = file_manager.getData_json("no_touch/config.json")
-			self.ThreadCount = 0
-
-			try:
-				self.ServerSocket.bind((host, port))
-			except socket.error as e:
-				print(str(e))
-				return
-
-			print("Waiting for connections...")
-			self.ServerSocket.listen(5)
-
-		def handler(self, actClass, data):
-			data = data.split(":")
-			opCode = int(data[0])
-			uData = data[1]
-			dType = data[2]
-
-			if 'list' in dType:
-				uData = UPL.Core.dataTypes.strList(uData)
-			elif 'dict' in dType:
-				uData = UPL.Core.dataTypes.strDict(uData)
-			elif 'str' in dType:
-				uData = str(uData)
-			elif 'float' in dType:
-				uData = float(uData)
-			elif 'int' in dType:
-				uData = int(uData)
-			elif 'bool' in dType:
-				uData = bool(uData)
-
-			actClass.process(opCode, uData)
-			
-		## when connections are forced off it can throw an error but said error is not bad
-		def threaded_client(self, connection, addr, c):
-			SA = serverActions(connection, addr, c, self.config)
-			connection.send(str.encode('Welcome to the Server\n'))
-			while True:
-				data = connection.recv(2048).decode('ascii')
-				self.handler(SA, data)
-				reply = 'Server Says: You are thread: ' + str(c)
-				if not data:
-					break
-				connection.sendall(str.encode(reply))
-			self.ThreadCount -= 1
-			print(f"Disconnected from: {addr[0]}:{str(addr[1])}")
-			print(f"Thread Count: {self.ThreadCount}")
-			connection.close()
-
-		def main(self):
-			while True:
-				Client, address = self.ServerSocket.accept()
-				print('Connected to: ' + address[0] + ':' + str(address[1]))
-				start_new_thread(self.threaded_client, (Client, address, self.ThreadCount,))
-				self.ThreadCount += 1
-				print('Thread Number: ' + str(self.ThreadCount))
-			# break
-			self.ServerSocket.close()
