@@ -2,9 +2,8 @@
 Unofficial Python Library
 
 
-Version 0.6
+Version 0.6.1
 
 Added socket support
 
-client class > UPL.Core.upl_socket.client
-server class > UPL.Core.upl_socket.server paired with UPL.Core.upl_socket.serverActions
+Removed upl_socket as it served no purpose.
