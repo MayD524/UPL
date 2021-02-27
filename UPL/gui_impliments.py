@@ -10,7 +10,6 @@ LARGE_FONT= ("Verdana", 12)
 NORM_FONT= ("Verdana", 10)
 SMALL_FONT= ("Verdana", 8)
 
-
 def popup(msg, title="!"):
 	popup = tk.Tk()
 	popup.wm_title(title)

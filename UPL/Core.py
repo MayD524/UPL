@@ -19,10 +19,13 @@ __version__ = "0.1.6"
 """
 
 
+
+
 """
 Pauses and waits for user to press
 enter
 """
+
 def PAUSE():
 	input("ENTER TO CONTINUE")
 
@@ -30,11 +33,75 @@ def make_hash(data):
 	hash_obj = hashlib.sha256(data.encode('utf-8'))
 	return hash_obj.hexdigest()
 
+def insert(source:list, newData:any) -> list:
+	if newData not in source:
+		return source.append(newData)
+	else:
+		print(f"{newData} already in source")
+		return False
+
+def removeVal(source, index):
+	newList = []
+	if type(index) == int:
+		if index <= len(source):
+			index = source[index]
+		else:
+			print(f'{index} out of range {len(source)}')
+			return False
+	for i in range(len(source)):
+		if source[i] != index:
+			newList.append(source[i])
+	return newList
+
+def progressBar(iteration, total, prefix = '', suffix = '', decimals = 1, length = 100, fill = '█', printEnd = '\r'):
+	"""
+    Call in a loop to create terminal progress bar
+    @params:
+        iteration   - Required  : current iteration (Int)
+        total       - Required  : total iterations (Int)
+        prefix      - Optional  : prefix string (Str)
+        suffix      - Optional  : suffix string (Str)
+        decimals    - Optional  : positive number of decimals in percent complete (Int)
+        length      - Optional  : character length of bar (Int)
+        fill        - Optional  : bar fill character (Str)
+        printEnd    - Optional  : end character (e.g. "\r", "\r\n") (Str)
+    """
+
+	percent = ("{0:." + str(decimals) + "f}").format(100 * (iteration / float(total)))
+	filledLength = int(length * iteration // total)
+	bar = fill * filledLength + '-' * (length - filledLength)
+	print(f'\r{prefix} |{bar}| {percent}% {suffix}', end = printEnd)
+    # Print New Line on Complete
+	if iteration == total: 
+		print()
+
+def char_frequency(string:str, exclude=None, include=None) -> dict:
+	characters = {}
+
+	for i in string:
+		if exclude != None and i in exclude:
+			continue
+		if include != None and i not in include:
+			continue
+		if i in characters:
+			characters[i] += 1
+		else:
+			characters[i] = 1
+
+	return characters
 """
 clears console
 """
 def clear():
 	os.system("clear" if os.name != "nt" else "cls")
+
+def removeStart(string:str,Length:int) -> str:
+	return string[Length:]
+
+def removeEnding(string:str, Length:int) -> str:
+	if Length > 0:
+		Length = Length * -1
+	return string[:Length]
 
 def safe_run(func):
 	def wrapper(*args):
@@ -56,6 +123,29 @@ def open_web(url=None, new=1):
 def currentDir():
 	return os.getcwd()
 
+def removeEmpty(array:list) -> list:
+	exitArray = []
+	for i in range(len(array)):
+		if array[i] == '\n':
+			continue
+		if len(array[i]) != 0:
+			exitArray.append(array[i])
+
+	return exitArray	
+
+def checkIn(string:str, array:list) -> str:
+	for i in array:
+		if i in string:
+			return i
+	return False ## returning that no item in the array is in string
+
+def asplit(string:str, number=2) -> list:
+	"""
+		Splits a string ever n characters -> default is 2
+	"""
+
+	return [string[i:i+number] for i in range(0, len(string), number)]
+
 ## removes a character from string
 def exclude(string=None, remove=" "):
 	if string != None:
@@ -63,7 +153,7 @@ def exclude(string=None, remove=" "):
 			return string.replace(remove, "")
 		else:
 			## remove not in string
-			return False
+			return string
 	else:
 		## empty string
 		return False
@@ -106,8 +196,8 @@ def ainput(prompt=None, outType=None, char_size=None, delim=None, ending=None):
 		else:
 			raise Exception("Incorrect extention")
 
-	else:
-		return outType(inp)
+	
+	return outType(inp)
 
 class dataTypes:
 	def strDict(string):
