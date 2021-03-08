@@ -199,6 +199,26 @@ def ainput(prompt=None, outType=None, char_size=None, delim=None, ending=None):
 	
 	return outType(inp)
 
+class licenceManager:
+    def __init__(self, magic):
+        self.magic = magic
+
+    def make_check(self, string):
+        end = 0
+        for i in string:
+            end += ord(i)
+        
+        end += self.magic
+
+        return end
+
+    def compair_keys(self, check, string):
+        stringSum = self.make_check(string)
+        return check == stringSum
+
+	
+	
+
 class dataTypes:
 	def strDict(string):
 		try:
