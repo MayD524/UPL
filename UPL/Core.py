@@ -1,9 +1,11 @@
 from pathlib import Path
 import urllib.request
+import cryptocode
 import subprocess
 import webbrowser
 import zipfile
 import hashlib
+import getpass
 import uuid
 import json
 import sys
@@ -25,9 +27,11 @@ __version__ = "0.1.6"
 Pauses and waits for user to press
 enter
 """
-
 def PAUSE():
 	input("ENTER TO CONTINUE")
+
+def getUser() -> str:
+	return getpass.getuser()
 
 def make_hash(data):
 	hash_obj = hashlib.sha256(data.encode('utf-8'))
@@ -162,11 +166,16 @@ def exclude(string=None, remove=" "):
 ainput > is input with options to do common 
 actions with console prompt 
 """
-def ainput(prompt=None, outType=None, char_size=None, delim=None, ending=None):
+def ainput(prompt=None, outType=None, min_size=None, char_size=None, delim=None, ending=None):
 	if outType == None: outType = str if delim == None else list
 	if prompt == None: prompt = ""
 
 	inp = input(prompt)
+
+	if min_size != None:
+		if not len(inp) >= min_size:
+			return False
+			
 	if inp == "" and outType == None:
 		return False
 
@@ -189,7 +198,7 @@ def ainput(prompt=None, outType=None, char_size=None, delim=None, ending=None):
 			li = inp.split(delim)
 
 		return li
-
+	
 	elif ending != None:
 		if inp.endswith(ending):
 			return outType(inp)
@@ -216,9 +225,6 @@ class licenceManager:
         stringSum = self.make_check(string)
         return check == stringSum
 
-	
-	
-
 class dataTypes:
 	def strDict(string):
 		try:
@@ -235,6 +241,60 @@ class dataTypes:
 			return json.dumps(dct)
 		except Exception as e:
 			print(e)
+
+
+class JSONTABLE:
+	def __init__(self, new=True, data=None):
+		if new != True:
+			self.jsonData = data
+			if "UUID" in self.jsonData.keys:
+				self.UUID = self.jsonData["UUID"]
+			else:
+				self.UUID = generate_uuid()
+				self.jsonData["UUID"] = self.UUID
+		else:
+			self.UUID = generate_uuid()
+			self.jsonData = {
+				"UUID":self.UUID,
+				"NAME":f"{self.UUID}.json"
+			}
+	
+	def encrypt_data(self, data, passw):
+		return cryptocode.encrypt(data, passw)
+
+
+	def table_add(self, table_name, key=None, value=None):
+		if self.table_exists(table_name):
+			pass
+
+		else:
+			return False
+
+	def table_exists(self, table_name):
+		return table_name in self.jsonData.keys()
+
+	def create_table(self, table_name, encrypt=False):
+		flags = [encrypt]
+		self.jsonData[table_name] = {"Flags":flags}
+
+
+"""
+	Basic grid type, will
+	expand later
+"""
+class grid:
+	def __init__(self, data:list):
+		self.main_grid = [data]
+
+	def __str__(self):
+		return str(self.main_grid)
+
+	def append(self, val:list):
+		self.main_grid.append(val)
+
+	def remove(self, index):
+		del self.main_grid[index]
+
 """
 getHome > returns current users 
 home directory "C:\\Users\\Username"
@@ -489,5 +549,3 @@ class file_manager:
 
 		else:
 			return f"File '{file}' was not found or cannot be accessed"
-
-
