@@ -126,6 +126,7 @@ def open_web(url=None, new=1):
 
 def currentDir():
 	return os.getcwd()
+			
 
 def removeEmpty(array:list) -> list:
 	exitArray = []
@@ -161,6 +162,7 @@ def exclude(string=None, remove=" "):
 	else:
 		## empty string
 		return False
+
 
 """
 ainput > is input with options to do common 
@@ -226,16 +228,18 @@ class licenceManager:
         return check == stringSum
 
 class dataTypes:
+	@staticmethod
 	def strDict(string):
 		try:
 			return json.loads(string)
 		except json.JSONDecodeError as e:
 			return e
 
+	@staticmethod
 	def strList(string):
 		return ast.literal_eval(string)
 
-
+	@staticmethod
 	def dictFormat(dct):
 		try:
 			return json.dumps(dct)
@@ -339,6 +343,7 @@ such as PIP and installing packages
 at runtime
 """
 class py_tools:
+	@staticmethod
 	def pip_install(package):
 		try:
 			if type(package) == str:
@@ -348,6 +353,7 @@ class py_tools:
 		except Exception as e:
 			print(e)
 
+	@staticmethod
 	def pip_install_mass(package):
 		for pack in package:
 			try:
@@ -360,7 +366,7 @@ system_tools class is for common
 system calls and actions 
 """
 class system_tools:
-
+	@staticmethod
 	def make_call(call):
 		subprocess.check_call(call)
 
@@ -370,11 +376,13 @@ upl_web class is for
 web tasks
 """
 class upl_web:
+	@staticmethod
 	def download_url(url=None, outdir=None):
 		if outdir == None:
 			outdir = f"{getHome()}\\Downloads"
 		urllib.request.urlretrieve(url, outdir)
 
+	@staticmethod
 	def url_exist(url):
 		"""
 		Checks that a given URL is reachable.
@@ -390,6 +398,7 @@ class upl_web:
 		except urllib.request.HTTPError:
 			return False
 
+	@staticmethod
 	def open(url):
 		if self.url_exist(url):
 			webbrowser.oepn(url, new=1)
@@ -402,10 +411,11 @@ math and most return a
 lambda function
 """
 class upl_math:
-
+	@staticmethod
 	def geometric(first, common):
 		return lambda n : first * (common ** (n - 1))
 
+	@staticmethod
 	def arithmetic(first, common):
 		return lambda n : first + common * (n - 1)
 
@@ -417,6 +427,7 @@ with json support
 """
 class file_manager:
 	## Json files
+	@staticmethod
 	def getData_json(file):
 		if file_exists(file):
 			with open(file, "r+") as jsReader:
@@ -424,6 +435,7 @@ class file_manager:
 		else:
 			return f"File '{file}' not found"
 
+	@staticmethod
 	def write_json(file, data=None, indent=1):
 		if file_exists(file) and type(data) == dict or data == None:
 			with open(file, "w+") as jsWriter:
@@ -435,6 +447,7 @@ class file_manager:
 		else:
 			return f"Either file does not exist or data is not a dict or NULL"
 
+	@staticmethod
 	def make_json(file):
 		if not file_exists(file):
 			with open(file, "w+") as wr:
@@ -442,6 +455,7 @@ class file_manager:
 		else:
 			return f"File '{file}' exists"
 
+	@staticmethod
 	def wipe_json(file):
 		if file_exists(file):
 			with open(file, "w+") as wr:
@@ -450,6 +464,7 @@ class file_manager:
 			file_manager.make_json(file)
 
 	## Other files
+	@staticmethod
 	def read_file(file):
 		if os.path.exists(file):
 			tmp = []
@@ -461,20 +476,34 @@ class file_manager:
 		else:
 			return f"File '{file}' was not found"
 
+	@staticmethod
 	def make_file(file):
 		if not file_exists(file):
 			with open(file, "w+") as f:pass
 			return True
 		else:
 			return False
+
+	@staticmethod
+	def clean_read(file):
+		if file_exists(file):
+			with open(file, "r") as reader:
+				lines = (line.rstrip() for line in reader) 
+				lines = list(line for line in lines if line) ## non-blank lines in a list
+			
+			return lines
+
+		return f"File '{file}' was not found."
+	@staticmethod
 	def write_file(file, data, mode=None):
 		if file_exists(file):
 			with open(file, mode if mode != None else "w") as writer:
 				writer.write(data)
 		else:
-			return f"File '{file}' was not found"
+			return f"File '{file}' was not found."
 
 	## Zip files
+	@staticmethod
 	def unzip(file):
 		if file_exists(file):
 			try:
@@ -485,6 +514,7 @@ class file_manager:
 		else:
 			return "File does not exist"
 
+	@staticmethod
 	def zip_dir(folderPath=None, zipPath=None):
 		if dir_exists(folderPath):
 			if zipPath == None:
@@ -500,6 +530,7 @@ class file_manager:
 		else:
 			return f"{folderPath} is not a folder"
 
+	@staticmethod
 	def zip_file(file=None, zipPath=None):
 		if file_exists(file):
 			if zipPath == None:
@@ -510,6 +541,7 @@ class file_manager:
 			return f"{file} is not a file"
 
 	## Hash
+	@staticmethod
 	def file_hash(file):
 		if file_exists(file):
 			hashs = []
@@ -522,6 +554,7 @@ class file_manager:
 			return f"{file} was not found"
 		
 	## General
+	@staticmethod
 	def renameFile(filename, newFilename):
 		if file_exists(filename):
 			os.rename(filename, newFilename)
@@ -529,6 +562,7 @@ class file_manager:
 		else:
 			return f"{filename} does not eixst"
 
+	@staticmethod
 	def delete_file(filename):
 		if file_exists(filename):
 			os.remove(filename)
@@ -536,6 +570,7 @@ class file_manager:
 		else:
 			return f"{filename} does not exist"
 
+	@staticmethod
 	def create_dir(dir_name):
 		if dir_exists(dir_name):
 			return f"{dir_name} already exists"
@@ -543,6 +578,7 @@ class file_manager:
 			os.makedirs(dir_name)
 			return True
 
+	@staticmethod
 	def getSize(file):
 		if file_exists(file):
 			return os.path.getsize(file)

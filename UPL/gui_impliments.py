@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
-from win10toast import ToastNotifier
+#from win10toast import ToastNotifier
 from UPL.Core import file_manager as fm
 from UPL import Core as cr
 import pyautogui
@@ -93,7 +93,7 @@ def screen_shot(filename=None):
 		item = pyautogui.screenshot(filename)
 
 	return item
-
+"""
 def send_notification(icon=None,threaded=True, title=None, message=None):
 	notifier = ToastNotifier()
 	if icon != None:
@@ -109,3 +109,4 @@ def send_notification(icon=None,threaded=True, title=None, message=None):
 			message,
 			threaded=threaded
 			)
+"""
