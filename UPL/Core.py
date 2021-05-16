@@ -479,7 +479,7 @@ class file_manager:
 	@staticmethod
 	def make_file(file):
 		if not file_exists(file):
-			with open(file, "w+") as f:pass
+			with open(file, "w+") as f: pass
 			return True
 		else:
 			return False
