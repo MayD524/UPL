@@ -1,16 +1,19 @@
-from pathlib import Path
-import urllib.request
-import cryptocode
+import ast
+import getpass
+import hashlib
+import json
+import os
+import random
+import string
 import subprocess
+import sys
+import urllib.request
+import uuid
 import webbrowser
 import zipfile
-import hashlib
-import getpass
-import uuid
-import json
-import sys
-import ast
-import os
+from pathlib import Path
+
+import cryptocode
 
 __version__ = "0.1.6"
 
@@ -43,6 +46,14 @@ def insert(source:list, newData:any) -> list:
 	else:
 		print(f"{newData} already in source")
 		return False
+
+def generate_code(lenght:int) -> str:
+    chars = string.printable.strip()
+    ret = ""
+    for i in range(lenght):
+        ret += random.choice(chars)
+    
+    return ret
 
 def removeVal(source, index):
 	newList = []
@@ -96,7 +107,7 @@ def char_frequency(string:str, exclude=None, include=None) -> dict:
 """
 clears console
 """
-def clear():
+def clear(*args):
 	os.system("clear" if os.name != "nt" else "cls")
 
 def removeStart(string:str,Length:int) -> str:
@@ -127,7 +138,6 @@ def open_web(url=None, new=1):
 def currentDir():
 	return os.getcwd()
 			
-
 def removeEmpty(array:list) -> list:
 	exitArray = []
 	for i in range(len(array)):
@@ -497,6 +507,8 @@ class file_manager:
 	@staticmethod
 	def write_file(file, data, mode=None):
 		if file_exists(file):
+			if type(data) == list:
+				data = "".join(data)
 			with open(file, mode if mode != None else "w") as writer:
 				writer.write(data)
 		else:

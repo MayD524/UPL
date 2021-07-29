@@ -6,7 +6,6 @@ from UPL import Core as cr
 import pyautogui
 import os
 
-## general constants
 LARGE_FONT= ("Verdana", 12)
 NORM_FONT= ("Verdana", 10)
 SMALL_FONT= ("Verdana", 8)
