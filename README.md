@@ -1,12 +1,14 @@
 # UPL
 Unofficial Python Library
 
-Version 0.6.1
+Version 0.6.3
 
-Pypi page:
-https://pypi.org/project/UPL/
+# To Install
+Install UPL and put it into your python Lib folder then run the
+following pip install commands.
 
-## To install with pip:
-```
-pip install UPL
-```
+```pip install cryptocode```
+```pip install pyautogui```
+```pip install playsound```
+```pip install pydub```
+```pip install pyttsx3```
