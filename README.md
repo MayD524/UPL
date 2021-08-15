@@ -5,7 +5,7 @@ Version 0.6.3
 
 # To Install
 Install UPL and put it into your python Lib folder then run the
-following pip install commands.
+following pip install commands or run the auto_upl.py file.
 
 ```pip install cryptocode```
 ```pip install pyautogui```
