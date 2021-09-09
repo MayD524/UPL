@@ -1,7 +1,7 @@
 # UPL
 Unofficial Python Library
 
-Version 0.6.3
+Version 0.8
 
 # To Install
 Install UPL and put it into your python Lib folder then run the
