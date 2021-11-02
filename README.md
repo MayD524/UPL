@@ -1,4 +1,4 @@
-# UPL
+# UPL [![Upload Python Package](https://github.com/MayD524/UPL/actions/workflows/python-publish.yml/badge.svg)](https://github.com/MayD524/UPL/actions/workflows/python-publish.yml)
 Unofficial Python Library
 
 Version 0.8
